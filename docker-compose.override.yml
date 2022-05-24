@@ -1,0 +1,43 @@
+version: "3.4"
+
+# Development environment override
+services:
+  nginx:
+    volumes:
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d/
+
+  php:
+    volumes:
+      # The "cached" option has no effect on Linux but improves performance on Mac
+      - ./:/srv/app:rw,cached
+      - ./docker/php/conf.d/symfony.dev.ini:/usr/local/etc/php/conf.d/symfony.ini
+      # If you develop on Mac you can remove the var/ directory from the bind-mount
+      # for better performance by enabling the next line 
+      - /srv/app/var
+    environment:
+      APP_ENV: dev
+      XDEBUG_CONFIG: >-
+        client_host=host.docker.internal
+      XDEBUG_MODE: coverage
+      PHP_IDE_CONFIG: serverName=symfony
+      
+###> symfony/mercure-bundle ###
+###< symfony/mercure-bundle ###
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: yohann.biglia@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+    networks:
+      - symfony
+###> doctrine/doctrine-bundle ###
+  database:
+    volumes:
+      - db-data:/var/lib/postgresql/data:rw
+    ports:
+      - "5432"
+###< doctrine/doctrine-bundle ###

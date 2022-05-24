@@ -1,0 +1,17 @@
+version: "3.4"
+
+services:
+  front:
+      build:
+        context: .
+        dockerfile: ./docker/react/Dockerfile
+        
+  php: 
+      build:
+        context: .
+        target: symfony_php_debug
+        args:
+          SYMFONY_VERSION: ${SYMFONY_VERSION:-}
+          SKELETON: ${SKELETON:-symfony/skeleton}
+          STABILITY: ${STABILITY:-stable}
+      
