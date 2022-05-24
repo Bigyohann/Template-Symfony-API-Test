@@ -19,6 +19,46 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+            - '../src/Http/*/*Controller.php'
+            - '../src/Domain/Main/Service/AppService.php'
 
+
+    App\Http\AppController:
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+            - [ setSerializer, [ '@serializer' ] ]
+            - [ setNotifier, [ '@mercure.hub.default' ] ]
+            - [ setValidator, [ '@validator' ] ]
+    
+    App\Domain\Main\Service\AppService:
+        calls:
+            - [ setSerializer, [ '@serializer' ] ]
+            - [ setValidator, [ '@validator' ] ]
+    
+    App\Domain\:
+        resource: '../src/Domain/*/*Service.php'
+        exclude: [ '../src/Domain/Main/Service/AppService.php' ]
+        parent: App\Domain\Main\Service\AppService
+    
+    App\Http\:
+        resource: '../src/Http/*/*Controller.php'
+        exclude:
+            - '../src/Http/AppController.php'
+        parent: App\Http\AppController
+    
+    App\EventListener\Exception\ValidationExceptionListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }
+    
+    App\EventListener\Exception\AppExceptionListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }
+        arguments:
+            - '@logger'
+    
+    acme_api.event.authentication_success_listener:
+        class: App\EventListener\Authentication\AuthenticationSuccessListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccessResponse }
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
