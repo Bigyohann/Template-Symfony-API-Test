@@ -51,41 +51,23 @@ services:
       - target: 5432
         published: 5432
 ###< doctrine/doctrine-bundle ###
- 
-  mercure:
-      image: dunglas/mercure
-      ports: 
-        - "3040:80"
-      environment:
-          SERVER_NAME: ':80'
-          MERCURE_PUBLISHER_JWT_KEY: '!ChangeMe!'
-          MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeMe!'
-          DEBUG: debug
-          MERCURE_EXTRA_DIRECTIVES: |-
-              cors_origins *
-              anonymous
-      networks:
-          - symfony
-
-
 ###> doctrine/doctrine-bundle ###
 
 ###> symfony/mercure-bundle ###
   mercure:
     image: dunglas/mercure
-    restart: unless-stopped
+    ports:
+      - "3040:80"
     environment:
       SERVER_NAME: ':80'
       MERCURE_PUBLISHER_JWT_KEY: '!ChangeMe!'
       MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeMe!'
-      # Set the URL of your Symfony project (without trailing slash!) as value of the cors_origins directive
-      MERCURE_EXTRA_DIRECTIVES: |
-        cors_origins http://127.0.0.1:8000
-    # Comment the following line to disable the development mode
-    command: /usr/bin/caddy run -config /etc/caddy/Caddyfile.dev
-    volumes:
-      - mercure_data:/data
-      - mercure_config:/config
+      DEBUG: debug
+      MERCURE_EXTRA_DIRECTIVES: |-
+        cors_origins *
+        anonymous
+    networks:
+      - symfony
 ###< symfony/mercure-bundle ###
 volumes:
   db-data:

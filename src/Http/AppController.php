@@ -58,9 +58,4 @@ abstract class AppController extends AbstractController
             ['groups' => $groups]
         );
     }
-
-    public function getUser(): User
-    {
-        return parent::getUser();
-    }
 }

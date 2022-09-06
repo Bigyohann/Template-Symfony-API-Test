@@ -2,13 +2,20 @@
 
 namespace App\Http\User;
 
+use App\Domain\User\Dto\UserRegisterDto;
+use App\Domain\User\Dto\UserUpdateProfileDto;
+use App\Domain\User\Dto\UserUpdateRoleDto;
+use App\Domain\User\Entity\User;
 use App\Domain\User\UserService;
 use App\Exception\Api\ValidationException;
 use App\Http\AppController;
+use Exception;
+use ReflectionException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 #[Route('/user')]
 class UserController extends AppController
@@ -17,41 +24,75 @@ class UserController extends AppController
     /**
      * @param UserService $userService
      */
-    public function __construct(private UserService $userService)
+    public function __construct(private readonly UserService $userService)
     {
     }
 
     /**
-     * @throws ValidationException
+     * @param User $user
+     * @return JsonResponse
      */
     #[Route('/profile', name: 'user_profile_show', methods: ['GET'])]
-    public function getUserProfile(): JsonResponse
+    public function getUserProfile( #[CurrentUser] User $user): JsonResponse
     {
-        $this->denyAccessUnlessGranted('edit', $this->getUser());
-
-        $user = $this->userService->getUserById($this->getUser()->getId());
+        $user = $this->userService->getUserById($user->getId());
         return $this->jsonResponse($user, 200, 'retrieved', ['user:read']);
     }
 
     /**
-     * @throws ValidationException
+     * @param int $id
+     * @return JsonResponse
+     */
+    #[Route('/{id}', name: 'user_get', methods: ['GET'])]
+    public function getUserById(int $id): JsonResponse
+    {
+        $user = $this->userService->getUserById($id);
+        if (!$user) {
+            throw new NotFoundHttpException('User not found');
+        }
+        return $this->jsonResponse($this->userService->getUserById($id), 200, 'retrieved', ['user:read', 'admin:read']);
+    }
+
+    /**
+     * @throws ReflectionException
      */
     #[Route('/profile', name: 'user_profile_edit', methods: ['PUT'])]
-    public function updateUserProfile(Request $request): JsonResponse
+    public function updateUserProfile(UserUpdateProfileDto $userUpdateProfileDto, #[CurrentUser] User $user): JsonResponse
     {
-        $this->denyAccessUnlessGranted('edit', $this->getUser());
+        $user = $this->userService->updateUserById($user->getId(), $userUpdateProfileDto);
+        return $this->jsonResponse($user, 200, 'created', ['user:read']);
+    }
 
-        $user = $this->userService->updateUserById($this->getUser()->getId(), $request->getContent());
+    /**
+     * @param int $id
+     * @param UserUpdateProfileDto $userUpdateProfileDto
+     * @return JsonResponse
+     * @throws ReflectionException
+     */
+    #[Route('/{id}', name: 'user_update', methods: ['PUT'])]
+    public function updateUserById(int $id, UserUpdateProfileDto $userUpdateProfileDto): JsonResponse
+    {
+        $user = $this->userService->updateUserById($id, $userUpdateProfileDto);
+        return $this->jsonResponse($user, 200, 'updated', ['user:read']);
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws Exception
+     */
+    #[Route('/', name: 'user_register', methods: ['POST'])]
+    public function registerUser(UserRegisterDto $userRegisterDto): JsonResponse
+    {
+        $user = $this->userService->registerUser($userRegisterDto);
         return $this->jsonResponse($user, 200, 'updated', ['user:read']);
     }
 
     /**
      * @return JsonResponse
      */
-    #[Route('/', name: 'admin_user_index', methods: ['GET'])]
+    #[Route('/', name: 'user_index', methods: ['GET'])]
     public function getAllUsers(): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         return $this->jsonResponse($this->userService->getAllUsers(), 200, 'retrieved', ['user:read', 'admin:read']);
     }
 
@@ -59,22 +100,7 @@ class UserController extends AppController
      * @param int $id
      * @return JsonResponse
      */
-    #[Route('/{id}', name: 'admin_user_get', methods: ['GET'])]
-    public function getUserById(int $id): JsonResponse
-    {
-        $user = $this->userService->getUserById($id);
-        if (!$user) {
-            throw new NotFoundHttpException('User not found');
-        }
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        return $this->jsonResponse($this->userService->getUserById($id), 200, 'retrieved', ['user:read', 'admin:read']);
-    }
-
-    /**
-     * @param int $id
-     * @return JsonResponse
-     */
-    #[Route('/{id}', name: 'admin_user_delete', methods: ['DELETE'])]
+    #[Route('/{id}', name: 'user_delete', methods: ['DELETE'])]
     public function deleteUserById(int $id): JsonResponse
     {
         $user = $this->userService->getUserById($id);
@@ -87,24 +113,12 @@ class UserController extends AppController
     }
 
     /**
-     * @param int $id
-     * @param Request $request
-     * @return JsonResponse
-     * @throws ValidationException
+     * @throws ReflectionException
      */
-    #[Route('/{id}', name: 'admin_user_update', methods: ['PUT'])]
-    public function updateUserById(int $id, Request $request): JsonResponse
+    #[Route('/{id}/role', name: 'user_role_update', methods: ['PUT'])]
+    public function updateUserRoleById(int $id, UserUpdateRoleDto $userUpdateRoleDto): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        $user = $this->userService->updateUserById($id, $request->getContent());
-        return $this->jsonResponse($user, 200, 'updated', ['user:read']);
-    }
-
-    #[Route('/{id}/role', name: 'admin_user_role_update', methods: ['PUT'])]
-    public function updateUserRoleById(int $id, Request $request): JsonResponse
-    {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        $user = $this->userService->updateUserRoleById($id, $request->getContent());
+        $user = $this->userService->updateUserRoleById($id, $userUpdateRoleDto);
         return $this->jsonResponse($user, 200, 'updated', ['user:read']);
     }
 

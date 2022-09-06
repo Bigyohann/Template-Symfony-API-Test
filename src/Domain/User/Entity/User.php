@@ -3,7 +3,6 @@
 namespace App\Domain\User\Entity;
 
 use App\Domain\Main\Entity\TimeStampableTrait;
-use App\Domain\Post\Entity\Post;
 use App\Domain\User\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -50,12 +49,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(groups: ['user:read', 'user:register', 'user:update'])]
     #[Assert\NotBlank(groups: ['user:register'])]
     private string $lastName;
-
-    public function __construct()
-    {
-        $this->posts = new ArrayCollection();
-    }
-
 
     public function getId(): ?int
     {

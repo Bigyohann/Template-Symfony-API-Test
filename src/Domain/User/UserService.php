@@ -3,20 +3,24 @@
 namespace App\Domain\User;
 
 use App\Domain\Main\Service\AppService;
+use App\Domain\User\Dto\UserRegisterDto;
+use App\Domain\User\Dto\UserUpdateProfileDto;
+use App\Domain\User\Dto\UserUpdateRoleDto;
 use App\Domain\User\Entity\User;
 use App\Domain\User\Exception\UserEmailExistException;
 use App\Domain\User\Repository\UserRepository;
-use App\Exception\Api\ValidationException;
 use Exception;
+use ReflectionException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserService extends AppService
 {
     public function __construct(
-        private UserRepository              $userRepository,
-        private UserPasswordHasherInterface $passwordHasher
-    ) {
+        private readonly UserRepository              $userRepository,
+        private readonly UserPasswordHasherInterface $passwordHasher
+    )
+    {
     }
 
     /**
@@ -29,45 +33,52 @@ class UserService extends AppService
 
     public function getUserById(int $id): ?User
     {
-        return $this->userRepository->find($id);
+        $user =  $this->userRepository->find($id);
+        if (!$user) {
+            throw new NotFoundHttpException('User not found');
+        }
+        return $user;
     }
 
     /**
      * @throws Exception
      */
-    public function registerUser($data): User
+    public function registerUser(UserRegisterDto $userRegisterDto): User
     {
         $user = new User();
 
-        $this->validateAndPopulate(User::class, $data, $user, ['user:register']);
-
-        if ($this->userRepository->findOneBy(['email' => $user->getEmail()])) {
+        if ($this->userRepository->findOneBy(['email' => $userRegisterDto->email])) {
             throw new UserEmailExistException('User with this email already exists');
         }
 
-        $user->setPassword($this->passwordHasher->hashPassword($user, $user->getPassword()));
+        $userRegisterDto->transformToObject($user);
+        $user->setPassword($this->passwordHasher->hashPassword($user, $userRegisterDto->password));
 
         $this->userRepository->save($user);
         return $user;
     }
 
+
     /**
-     * @throws ValidationException
+     * @throws ReflectionException
      */
-    public function updateUserById(int $id, $data): User
+    public function updateUserById(int $id, UserUpdateProfileDto $userUpdateProfileDto): User
     {
-        $user = $this->userRepository->find($id);
+        $user = $this->getUserById($id);
 
         if (!$user) {
             throw new NotFoundHttpException('User not found');
         }
 
-        $userEmail = $user->getEmail();
-        $this->validateAndPopulate(User::class, $data, $user, ['user:update']);
 
-        if ($userEmail !== $user->getEmail() && $this->userRepository->findOneBy(['email' => $user->getEmail()])) {
-            throw new UserEmailExistException('User with this email already exists');
+        if ($userUpdateProfileDto->email){
+            if ($userUpdateProfileDto->email !== $user->getEmail() &&
+                $this->userRepository->findOneBy(['email' => $userUpdateProfileDto->email])) {
+                throw new UserEmailExistException('User with this email already exists');
+            }
         }
+        $userUpdateProfileDto->transformToObject($user);
+
         $this->userRepository->save($user);
 
         return $user;
@@ -75,7 +86,20 @@ class UserService extends AppService
 
     public function deleteUserById(int $id)
     {
-        $user = $this->userRepository->find($id);
+        $user = $this->getUserById($id);
         $this->userRepository->remove($user);
+    }
+    /**
+     * @throws ReflectionException
+     */
+    public function updateUserRoleById(int $id, UserUpdateRoleDto $userUpdateRoleDto): User
+    {
+        $user = $this->getUserById($id);
+
+        $userUpdateRoleDto->transformToObject($user);
+
+        $this->userRepository->save($user);
+
+        return $user;
     }
 }
