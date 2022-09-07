@@ -2,8 +2,8 @@
 
 namespace App\Http\Utils\ParamConverter;
 
+use App\Domain\Main\Dto\Dto;
 use App\Exception\Api\ValidationException;
-use App\Http\Utils\Dto\Dto;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;

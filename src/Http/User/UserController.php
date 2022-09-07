@@ -7,12 +7,10 @@ use App\Domain\User\Dto\UserUpdateProfileDto;
 use App\Domain\User\Dto\UserUpdateRoleDto;
 use App\Domain\User\Entity\User;
 use App\Domain\User\UserService;
-use App\Exception\Api\ValidationException;
 use App\Http\AppController;
 use Exception;
 use ReflectionException;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -33,10 +31,10 @@ class UserController extends AppController
      * @return JsonResponse
      */
     #[Route('/profile', name: 'user_profile_show', methods: ['GET'])]
-    public function getUserProfile( #[CurrentUser] User $user): JsonResponse
+    public function getUserProfile(#[CurrentUser] User $user): JsonResponse
     {
         $user = $this->userService->getUserById($user->getId());
-        return $this->jsonResponse($user, 200, 'retrieved', ['user:read']);
+        return $this->jsonResponse($user, 200, 'retrieved');
     }
 
     /**
@@ -50,7 +48,7 @@ class UserController extends AppController
         if (!$user) {
             throw new NotFoundHttpException('User not found');
         }
-        return $this->jsonResponse($this->userService->getUserById($id), 200, 'retrieved', ['user:read', 'admin:read']);
+        return $this->jsonResponse($this->userService->getUserById($id), 200, 'retrieved');
     }
 
     /**
@@ -60,7 +58,7 @@ class UserController extends AppController
     public function updateUserProfile(UserUpdateProfileDto $userUpdateProfileDto, #[CurrentUser] User $user): JsonResponse
     {
         $user = $this->userService->updateUserById($user->getId(), $userUpdateProfileDto);
-        return $this->jsonResponse($user, 200, 'created', ['user:read']);
+        return $this->jsonResponse($user, 200, 'created');
     }
 
     /**
@@ -73,7 +71,7 @@ class UserController extends AppController
     public function updateUserById(int $id, UserUpdateProfileDto $userUpdateProfileDto): JsonResponse
     {
         $user = $this->userService->updateUserById($id, $userUpdateProfileDto);
-        return $this->jsonResponse($user, 200, 'updated', ['user:read']);
+        return $this->jsonResponse($user, 200, 'updated');
     }
 
     /**
@@ -84,7 +82,7 @@ class UserController extends AppController
     public function registerUser(UserRegisterDto $userRegisterDto): JsonResponse
     {
         $user = $this->userService->registerUser($userRegisterDto);
-        return $this->jsonResponse($user, 200, 'updated', ['user:read']);
+        return $this->jsonResponse($user, 200, 'updated');
     }
 
     /**
@@ -93,7 +91,7 @@ class UserController extends AppController
     #[Route('/', name: 'user_index', methods: ['GET'])]
     public function getAllUsers(): JsonResponse
     {
-        return $this->jsonResponse($this->userService->getAllUsers(), 200, 'retrieved', ['user:read', 'admin:read']);
+        return $this->jsonResponse($this->userService->getAllUsers(), 200, 'retrieved');
     }
 
     /**
@@ -119,7 +117,7 @@ class UserController extends AppController
     public function updateUserRoleById(int $id, UserUpdateRoleDto $userUpdateRoleDto): JsonResponse
     {
         $user = $this->userService->updateUserRoleById($id, $userUpdateRoleDto);
-        return $this->jsonResponse($user, 200, 'updated', ['user:read']);
+        return $this->jsonResponse($user, 200, 'updated');
     }
 
 }

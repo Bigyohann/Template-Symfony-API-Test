@@ -26,15 +26,10 @@ services:
     App\Http\AppController:
         calls:
             - [ setLogger, [ '@logger' ] ]
-            - [ setSerializer, [ '@serializer' ] ]
-            - [ setNotifier, [ '@mercure.hub.default' ] ]
-            - [ setValidator, [ '@validator' ] ]
-    
+            - [ setSecurity, ['@security.helper']]
+
     App\Domain\Main\Service\AppService:
-        calls:
-            - [ setSerializer, [ '@serializer' ] ]
-            - [ setValidator, [ '@validator' ] ]
-    
+
     App\Domain\:
         resource: '../src/Domain/*/*Service.php'
         exclude: [ '../src/Domain/Main/Service/AppService.php' ]

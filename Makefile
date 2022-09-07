@@ -9,25 +9,14 @@ build-dev:
 build-prod-php:
 	@docker-compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env --env-file .env.local build php
 	@docker-compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env --env-file .env.local push php
-build-prod-front:
-	@docker-compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env --env-file .env.local build front
-	@docker-compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env --env-file .env.local push front
 stop:
 	@docker-compose stop
-bash-front:
-	@docker-compose exec front sh
-bash-php:
+bash:
 	@docker-compose exec php sh
-logs-php:
+logs:
 	docker-compose logs -f php
-logs-front:
-	docker-compose logs -f front
-npm:
-	@docker-compose exec front sh -c "yarn"
-test-front:
-	@docker-compose exec front sh -c "yarn test"
-test-php:
-	@docker-compose exec -T php sh -c "bin/console doctrine:migrations:migrate --no-interaction --env="test
+test:
+	@docker-compose exec -T php sh -c "bin/console doctrine:migrations:migrate --no-interaction --env='test'"
 	@docker-compose exec -T php sh -c "bin/phpunit -dpcov.enabled=1 --coverage-clover coverage.xml"
 compose-prod:
 	@docker-compose exec php sh -c "php bin/console cache:clear"

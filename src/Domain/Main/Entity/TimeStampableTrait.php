@@ -2,6 +2,7 @@
 
 namespace App\Domain\Main\Entity;
 
+use App\Domain\User\Entity\User;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
@@ -26,7 +27,7 @@ trait TimeStampableTrait
 
     /**
      * @param DateTimeInterface $createdAt
-     * @return self
+     * @return User|TimeStampableTrait
      */
     public function setCreatedAt(DateTimeInterface $createdAt): self
     {
@@ -45,7 +46,7 @@ trait TimeStampableTrait
 
     /**
      * @param DateTimeInterface $updatedAt
-     * @return $this
+     * @return User|TimeStampableTrait
      */
     public function setUpdatedAt(DateTimeInterface $updatedAt): self
     {

@@ -22,13 +22,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(groups: ['admin:read'])]
+    #[Groups(groups: ['user:read'])]
     private int $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
-    #[Groups(groups: ['user:read', 'user:register', 'user:update'])]
-    #[Assert\Email(groups: ['user:register', 'user:update'])]
-    #[Assert\NotBlank(groups: ['user:register'])]
+    #[Groups(groups: ['user:read'])]
     private string $email;
 
     #[ORM\Column(type: 'json')]
@@ -36,18 +34,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private array $roles = [];
 
     #[ORM\Column(type: 'string')]
-    #[Groups(groups: ['user:register'])]
-    #[Assert\NotBlank(groups: ['user:register'])]
     private string $password;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(groups: ['user:read', 'user:register', 'user:update'])]
-    #[Assert\NotBlank(groups: ['user:register'])]
+    #[Groups(groups: ['user:read'])]
     private string $firstName;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(groups: ['user:read', 'user:register', 'user:update'])]
-    #[Assert\NotBlank(groups: ['user:register'])]
+    #[Groups(groups: ['user:read'])]
     private string $lastName;
 
     public function getId(): ?int

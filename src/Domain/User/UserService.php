@@ -31,15 +31,6 @@ class UserService extends AppService
         return $this->userRepository->findAll();
     }
 
-    public function getUserById(int $id): ?User
-    {
-        $user =  $this->userRepository->find($id);
-        if (!$user) {
-            throw new NotFoundHttpException('User not found');
-        }
-        return $user;
-    }
-
     /**
      * @throws Exception
      */
@@ -47,17 +38,17 @@ class UserService extends AppService
     {
         $user = new User();
 
-        if ($this->userRepository->findOneBy(['email' => $userRegisterDto->email])) {
+        if ($this->userRepository->findOneBy(['email' => $userRegisterDto->getEmail()])) {
             throw new UserEmailExistException('User with this email already exists');
         }
 
         $userRegisterDto->transformToObject($user);
-        $user->setPassword($this->passwordHasher->hashPassword($user, $userRegisterDto->password));
+
+        $user->setPassword($this->passwordHasher->hashPassword($user, $userRegisterDto->getPassword()));
 
         $this->userRepository->save($user);
         return $user;
     }
-
 
     /**
      * @throws ReflectionException
@@ -71,16 +62,26 @@ class UserService extends AppService
         }
 
 
-        if ($userUpdateProfileDto->email){
-            if ($userUpdateProfileDto->email !== $user->getEmail() &&
-                $this->userRepository->findOneBy(['email' => $userUpdateProfileDto->email])) {
+        if ($userUpdateProfileDto->getEmail()) {
+            if ($userUpdateProfileDto->getEmail() !== $user->getEmail() &&
+                $this->userRepository->findOneBy(['email' => $userUpdateProfileDto->getEmail()])) {
                 throw new UserEmailExistException('User with this email already exists');
             }
         }
+
         $userUpdateProfileDto->transformToObject($user);
 
         $this->userRepository->save($user);
 
+        return $user;
+    }
+
+    public function getUserById(int $id): ?User
+    {
+        $user = $this->userRepository->find($id);
+        if (!$user) {
+            throw new NotFoundHttpException('User not found');
+        }
         return $user;
     }
 
@@ -89,6 +90,7 @@ class UserService extends AppService
         $user = $this->getUserById($id);
         $this->userRepository->remove($user);
     }
+
     /**
      * @throws ReflectionException
      */
