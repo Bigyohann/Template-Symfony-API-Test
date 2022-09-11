@@ -9,6 +9,7 @@
         "php": ">=8.1.6",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "bigyohann/symfony-dto-bundle": "^1.1",
         "doctrine/annotations": "^1.13",
         "doctrine/doctrine-bundle": "^2.6",
         "doctrine/doctrine-migrations-bundle": "^3.2",

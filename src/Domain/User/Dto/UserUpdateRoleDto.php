@@ -2,14 +2,14 @@
 
 namespace App\Domain\User\Dto;
 
-use App\Domain\Main\Dto\Attributes\ConvertPropertyDto;
-use App\Domain\Main\Dto\Dto;
+use Bigyohann\DtoBundle\Attributes\ConvertProperty;
+use Bigyohann\DtoBundle\Dto\Dto;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class UserUpdateRoleDto extends Dto
 {
     #[Assert\Choice(choices: ["ROLE_ADMIN", "ROLE_USER"], multiple: true)]
-    #[ConvertPropertyDto]
+    #[ConvertProperty]
     private array $roles = [];
 
     /**

@@ -13,7 +13,11 @@ class AppExceptionListener
     {
     }
 
-    public function onKernelException(ExceptionEvent $event)
+    /**
+     * @param ExceptionEvent $event
+     * @return void
+     */
+    public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
         if (!$exception instanceof HttpException) {

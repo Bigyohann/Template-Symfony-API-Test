@@ -2,25 +2,25 @@
 
 namespace App\Domain\User\Dto;
 
-use App\Domain\Main\Dto\Attributes\ConvertPropertyDto;
-use App\Domain\Main\Dto\Dto;
+use Bigyohann\DtoBundle\Attributes\ConvertProperty;
+use Bigyohann\DtoBundle\Dto\Dto;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class UserUpdateProfileDto extends Dto
 {
     #[Assert\Type(type: 'string')]
     #[Assert\Email]
-    #[ConvertPropertyDto]
+    #[ConvertProperty]
     private $email;
 
     #[Assert\Type(type: 'string')]
     #[Assert\Length(min: 2, max: 20)]
-    #[ConvertPropertyDto]
+    #[ConvertProperty]
     private $firstname;
 
     #[Assert\Type(type: 'string')]
     #[Assert\Length(min: 2, max: 20)]
-    #[ConvertPropertyDto]
+    #[ConvertProperty]
     private $lastname;
 
     /**

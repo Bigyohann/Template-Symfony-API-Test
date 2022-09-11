@@ -6,11 +6,8 @@ use App\Domain\User\Utils\RolesEnum;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 abstract class AppController extends AbstractController
 {
@@ -25,7 +22,15 @@ abstract class AppController extends AbstractController
         $this->logger = $logger;
     }
 
-    public function jsonResponse($data, $status = 200, $message = 'ok', $groups = ['user:read'], $headers = []): JsonResponse
+    /**
+     * @param $data
+     * @param int $status
+     * @param string $message
+     * @param array $groups
+     * @param array $headers
+     * @return JsonResponse
+     */
+    public function jsonResponse($data, int $status = 200, string $message = 'ok', array $groups = ['user:read'], array $headers = []): JsonResponse
     {
         if ($this->getUser()) {
             if (in_array(RolesEnum::ADMIN->value, $this->getUser()->getRoles())) {
@@ -42,6 +47,9 @@ abstract class AppController extends AbstractController
         );
     }
 
+    /**
+     * @return UserInterface|null
+     */
     public function getUser(): ?UserInterface
     {
         return $this->getSecurity()->getUser();

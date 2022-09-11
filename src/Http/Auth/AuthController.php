@@ -8,6 +8,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AuthController extends AppController
 {
+    /**
+     * @return Response
+     */
     #[Route('/logout', name: 'logout', methods: ['POST'])]
     public function logout(): Response
     {

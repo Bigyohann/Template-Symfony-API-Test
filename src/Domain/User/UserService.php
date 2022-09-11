@@ -9,8 +9,6 @@ use App\Domain\User\Dto\UserUpdateRoleDto;
 use App\Domain\User\Entity\User;
 use App\Domain\User\Exception\UserEmailExistException;
 use App\Domain\User\Repository\UserRepository;
-use Exception;
-use ReflectionException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -32,7 +30,8 @@ class UserService extends AppService
     }
 
     /**
-     * @throws Exception
+     * @param UserRegisterDto $userRegisterDto
+     * @return User
      */
     public function registerUser(UserRegisterDto $userRegisterDto): User
     {
@@ -51,7 +50,9 @@ class UserService extends AppService
     }
 
     /**
-     * @throws ReflectionException
+     * @param int $id
+     * @param UserUpdateProfileDto $userUpdateProfileDto
+     * @return User
      */
     public function updateUserById(int $id, UserUpdateProfileDto $userUpdateProfileDto): User
     {
@@ -76,6 +77,10 @@ class UserService extends AppService
         return $user;
     }
 
+    /**
+     * @param int $id
+     * @return User|null
+     */
     public function getUserById(int $id): ?User
     {
         $user = $this->userRepository->find($id);
@@ -85,14 +90,21 @@ class UserService extends AppService
         return $user;
     }
 
-    public function deleteUserById(int $id)
+    /**
+     * @param int $id
+     * @return void
+     */
+    public function deleteUserById(int $id): void
     {
         $user = $this->getUserById($id);
         $this->userRepository->remove($user);
     }
 
+
     /**
-     * @throws ReflectionException
+     * @param int $id
+     * @param UserUpdateRoleDto $userUpdateRoleDto
+     * @return User
      */
     public function updateUserRoleById(int $id, UserUpdateRoleDto $userUpdateRoleDto): User
     {

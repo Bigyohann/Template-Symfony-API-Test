@@ -2,31 +2,28 @@
 
 namespace App\Domain\User\Dto;
 
-use App\Domain\Main\Dto\Attributes\ConvertPropertyDto;
-use App\Domain\Main\Dto\Dto;
+use Bigyohann\DtoBundle\Attributes\ConvertProperty;
+use Bigyohann\DtoBundle\Dto\Dto;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class UserRegisterDto extends Dto
 {
+    #[Assert\Type(type: 'string')]
+    #[Assert\NotBlank]
+    #[ConvertProperty]
+    public ?string $lastName;
     #[Assert\Email]
     #[Assert\NotBlank]
-    #[ConvertPropertyDto]
+    #[ConvertProperty]
     private ?string $email;
-
     #[Assert\Type(type: 'string')]
     #[Assert\NotBlank]
-    #[ConvertPropertyDto(shouldConvertAutomatically: false)]
+    #[ConvertProperty(shouldConvertAutomatically: false)]
     private ?string $password;
-
     #[Assert\Type(type: 'string')]
     #[Assert\NotBlank]
-    #[ConvertPropertyDto]
+    #[ConvertProperty]
     private ?string $firstName;
-
-    #[Assert\Type(type: 'string')]
-    #[Assert\NotBlank]
-    #[ConvertPropertyDto]
-    public ?string $lastName;
 
     /**
      * @return string|null

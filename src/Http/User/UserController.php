@@ -8,8 +8,6 @@ use App\Domain\User\Dto\UserUpdateRoleDto;
 use App\Domain\User\Entity\User;
 use App\Domain\User\UserService;
 use App\Http\AppController;
-use Exception;
-use ReflectionException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,7 +16,6 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 #[Route('/user')]
 class UserController extends AppController
 {
-
     /**
      * @param UserService $userService
      */
@@ -52,7 +49,9 @@ class UserController extends AppController
     }
 
     /**
-     * @throws ReflectionException
+     * @param UserUpdateProfileDto $userUpdateProfileDto
+     * @param User $user
+     * @return JsonResponse
      */
     #[Route('/profile', name: 'user_profile_edit', methods: ['PUT'])]
     public function updateUserProfile(UserUpdateProfileDto $userUpdateProfileDto, #[CurrentUser] User $user): JsonResponse
@@ -65,7 +64,6 @@ class UserController extends AppController
      * @param int $id
      * @param UserUpdateProfileDto $userUpdateProfileDto
      * @return JsonResponse
-     * @throws ReflectionException
      */
     #[Route('/{id}', name: 'user_update', methods: ['PUT'])]
     public function updateUserById(int $id, UserUpdateProfileDto $userUpdateProfileDto): JsonResponse
@@ -75,8 +73,8 @@ class UserController extends AppController
     }
 
     /**
-     * @throws ReflectionException
-     * @throws Exception
+     * @param UserRegisterDto $userRegisterDto
+     * @return JsonResponse
      */
     #[Route('/', name: 'user_register', methods: ['POST'])]
     public function registerUser(UserRegisterDto $userRegisterDto): JsonResponse
@@ -111,7 +109,9 @@ class UserController extends AppController
     }
 
     /**
-     * @throws ReflectionException
+     * @param int $id
+     * @param UserUpdateRoleDto $userUpdateRoleDto
+     * @return JsonResponse
      */
     #[Route('/{id}/role', name: 'user_role_update', methods: ['PUT'])]
     public function updateUserRoleById(int $id, UserUpdateRoleDto $userUpdateRoleDto): JsonResponse
